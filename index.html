@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>My Daily Diary</title>
+  <style>
+    /* ===== Reset & Base ===== */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', 'Hiragino Sans', 'Noto Sans JP', sans-serif;
+      background: #f5f0eb;
+      color: #3a3028;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 2rem 1rem 4rem;
+    }
+
+    /* ===== Header ===== */
+    header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+    header h1 {
+      font-size: 2rem;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      color: #5c3d2e;
+    }
+    header p {
+      margin-top: 0.4rem;
+      font-size: 0.9rem;
+      color: #8a7060;
+    }
+
+    /* ===== Card ===== */
+    .card {
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+      padding: 2rem;
+      width: 100%;
+      max-width: 680px;
+    }
+
+    /* ===== Settings Section ===== */
+    .settings {
+      border: 1px solid #e8ddd5;
+      border-radius: 8px;
+      padding: 1.2rem 1.4rem;
+      margin-bottom: 1.6rem;
+      background: #fdf8f5;
+    }
+    .settings summary {
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 0.9rem;
+      color: #7a5c4a;
+      user-select: none;
+    }
+    .settings summary:hover { color: #5c3d2e; }
+    .settings-body {
+      margin-top: 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.8rem;
+    }
+    .field label {
+      display: block;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: #8a7060;
+      margin-bottom: 0.3rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+    .field input {
+      width: 100%;
+      padding: 0.55rem 0.75rem;
+      border: 1px solid #d9cfc8;
+      border-radius: 6px;
+      font-size: 0.9rem;
+      background: #fff;
+      color: #3a3028;
+      transition: border-color 0.2s;
+    }
+    .field input:focus {
+      outline: none;
+      border-color: #b07d5a;
+    }
+    .field input[type="password"] { letter-spacing: 0.1em; }
+    .save-btn {
+      align-self: flex-start;
+      padding: 0.45rem 1.2rem;
+      background: #b07d5a;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .save-btn:hover { background: #8f6040; }
+
+    /* ===== Entry Section ===== */
+    .entry-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 0.8rem;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+    .entry-header h2 {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #5c3d2e;
+    }
+    .date-input {
+      padding: 0.4rem 0.7rem;
+      border: 1px solid #d9cfc8;
+      border-radius: 6px;
+      font-size: 0.9rem;
+      color: #3a3028;
+      background: #fdf8f5;
+      cursor: pointer;
+    }
+    .date-input:focus { outline: none; border-color: #b07d5a; }
+
+    textarea {
+      width: 100%;
+      min-height: 280px;
+      padding: 1rem;
+      border: 1px solid #d9cfc8;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      font-family: 'Courier New', 'Noto Sans Mono', monospace;
+      line-height: 1.7;
+      resize: vertical;
+      background: #fdfcfb;
+      color: #3a3028;
+      transition: border-color 0.2s;
+    }
+    textarea:focus { outline: none; border-color: #b07d5a; }
+    textarea::placeholder { color: #c0afa5; }
+
+    /* ===== Actions ===== */
+    .actions {
+      display: flex;
+      gap: 0.8rem;
+      margin-top: 1rem;
+      flex-wrap: wrap;
+    }
+    .btn-primary {
+      flex: 1;
+      padding: 0.7rem 1.2rem;
+      background: #5c3d2e;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.1s;
+    }
+    .btn-primary:hover { background: #3a2018; }
+    .btn-primary:active { transform: scale(0.98); }
+    .btn-primary:disabled { background: #c0afa5; cursor: not-allowed; }
+
+    .btn-secondary {
+      padding: 0.7rem 1.2rem;
+      background: transparent;
+      color: #8a7060;
+      border: 1px solid #d9cfc8;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s, color 0.2s;
+    }
+    .btn-secondary:hover { background: #f5f0eb; color: #5c3d2e; }
+
+    /* ===== Status ===== */
+    #status {
+      margin-top: 1rem;
+      padding: 0.75rem 1rem;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      font-weight: 500;
+      display: none;
+    }
+    #status.success { display: block; background: #eaf5ec; color: #2d6a4f; border: 1px solid #b7dfc4; }
+    #status.error   { display: block; background: #fdecea; color: #b71c1c; border: 1px solid #f5c6c6; }
+    #status.loading { display: block; background: #fdf3e7; color: #7a5c4a; border: 1px solid #e8d5c0; }
+
+    /* ===== Preview ===== */
+    #preview-section {
+      display: none;
+      margin-top: 1.5rem;
+      border-top: 1px solid #e8ddd5;
+      padding-top: 1.2rem;
+    }
+    #preview-section h3 {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: #8a7060;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 0.6rem;
+    }
+    #preview-content {
+      background: #fdf8f5;
+      border: 1px solid #e8ddd5;
+      border-radius: 8px;
+      padding: 1rem 1.2rem;
+      font-size: 0.9rem;
+      line-height: 1.8;
+      white-space: pre-wrap;
+      font-family: 'Courier New', monospace;
+      color: #5c3d2e;
+      max-height: 200px;
+      overflow-y: auto;
+    }
+
+    /* ===== Footer ===== */
+    footer {
+      margin-top: 2rem;
+      font-size: 0.8rem;
+      color: #b0a090;
+      text-align: center;
+    }
+    footer a { color: #b07d5a; text-decoration: none; }
+    footer a:hover { text-decoration: underline; }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>📔 My Daily Diary</h1>
+    <p>今日の出来事を記録して、GitHub に保存しましょう。</p>
+  </header>
+
+  <div class="card">
+
+    <!-- Settings -->
+    <details class="settings" id="settings-details">
+      <summary>⚙️ GitHub 設定</summary>
+      <div class="settings-body">
+        <div class="field">
+          <label>GitHub ユーザー名</label>
+          <input type="text" id="gh-owner" placeholder="例: octocat" autocomplete="off" />
+        </div>
+        <div class="field">
+          <label>リポジトリ名</label>
+          <input type="text" id="gh-repo" placeholder="例: my-daily-diary" autocomplete="off" />
+        </div>
+        <div class="field">
+          <label>ブランチ名</label>
+          <input type="text" id="gh-branch" placeholder="例: main" autocomplete="off" />
+        </div>
+        <div class="field">
+          <label>Personal Access Token</label>
+          <input type="password" id="gh-token" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx" autocomplete="off" />
+        </div>
+        <button class="save-btn" onclick="saveSettings()">保存</button>
+      </div>
+    </details>
+
+    <!-- Entry -->
+    <div class="entry-header">
+      <h2>今日の日記</h2>
+      <input type="date" id="entry-date" class="date-input" />
+    </div>
+
+    <textarea id="entry-body" placeholder="今日あったことを自由に書いてください...&#10;&#10;Markdown 記法が使えます。&#10;例: **太字**, *斜体*, ## 見出し, - リスト"></textarea>
+
+    <div class="actions">
+      <button class="btn-primary" id="save-btn" onclick="saveEntry()">GitHub に保存</button>
+      <button class="btn-secondary" onclick="togglePreview()">プレビュー</button>
+      <button class="btn-secondary" onclick="clearEntry()">クリア</button>
+    </div>
+
+    <div id="status"></div>
+
+    <div id="preview-section">
+      <h3>Markdown プレビュー（生テキスト）</h3>
+      <div id="preview-content"></div>
+    </div>
+
+  </div>
+
+  <footer>
+    保存先リポジトリ:
+    <a id="repo-link" href="#" target="_blank">設定してください</a>
+  </footer>
+
+  <script>
+    // ===== 設定の読み込み / 保存 =====
+    const STORAGE_KEY = 'diary_settings';
+
+    function loadSettings() {
+      const s = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
+      document.getElementById('gh-owner').value  = s.owner  || '';
+      document.getElementById('gh-repo').value   = s.repo   || 'my-daily-diary';
+      document.getElementById('gh-branch').value = s.branch || 'main';
+      document.getElementById('gh-token').value  = s.token  || '';
+      updateRepoLink(s.owner, s.repo);
+    }
+
+    function saveSettings() {
+      const s = {
+        owner:  document.getElementById('gh-owner').value.trim(),
+        repo:   document.getElementById('gh-repo').value.trim(),
+        branch: document.getElementById('gh-branch').value.trim() || 'main',
+        token:  document.getElementById('gh-token').value.trim(),
+      };
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(s));
+      updateRepoLink(s.owner, s.repo);
+      showStatus('設定を保存しました。', 'success');
+      document.getElementById('settings-details').removeAttribute('open');
+    }
+
+    function getSettings() {
+      return JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
+    }
+
+    function updateRepoLink(owner, repo) {
+      const link = document.getElementById('repo-link');
+      if (owner && repo) {
+        link.href = `https://github.com/${owner}/${repo}`;
+        link.textContent = `${owner}/${repo}`;
+      } else {
+        link.href = '#';
+        link.textContent = '設定してください';
+      }
+    }
+
+    // ===== 日付の初期化 =====
+    function initDate() {
+      const today = new Date();
+      const yyyy = today.getFullYear();
+      const mm   = String(today.getMonth() + 1).padStart(2, '0');
+      const dd   = String(today.getDate()).padStart(2, '0');
+      document.getElementById('entry-date').value = `${yyyy}-${mm}-${dd}`;
+    }
+
+    // ===== Markdown の生成 =====
+    function buildMarkdown(date, body) {
+      const d = new Date(date + 'T00:00:00');
+      const weekdays = ['日', '月', '火', '水', '木', '金', '土'];
+      const dow = weekdays[d.getDay()];
+      const header = `# ${date}（${dow}曜日）\n\n`;
+      return header + body.trim() + '\n';
+    }
+
+    // ===== GitHub API でファイルを保存 =====
+    async function saveEntry() {
+      const s = getSettings();
+      if (!s.owner || !s.repo || !s.token) {
+        showStatus('⚠️ GitHub 設定が未入力です。上の「GitHub 設定」を開いて入力してください。', 'error');
+        document.getElementById('settings-details').setAttribute('open', '');
+        return;
+      }
+
+      const date = document.getElementById('entry-date').value;
+      const body = document.getElementById('entry-body').value.trim();
+
+      if (!date) { showStatus('⚠️ 日付を選択してください。', 'error'); return; }
+      if (!body)  { showStatus('⚠️ 日記の内容を入力してください。', 'error'); return; }
+
+      const btn = document.getElementById('save-btn');
+      btn.disabled = true;
+      showStatus('⏳ GitHub に保存中...', 'loading');
+
+      const markdown = buildMarkdown(date, body);
+      const path     = `entries/${date}.md`;
+      const branch   = s.branch || 'main';
+      const apiUrl   = `https://api.github.com/repos/${s.owner}/${s.repo}/contents/${path}`;
+
+      try {
+        // 既存ファイルの SHA を取得（更新の場合に必要）
+        let sha = null;
+        const checkRes = await fetch(apiUrl, {
+          headers: {
+            'Authorization': `Bearer ${s.token}`,
+            'Accept': 'application/vnd.github+json',
+          }
+        });
+        if (checkRes.ok) {
+          const existing = await checkRes.json();
+          sha = existing.sha;
+        }
+
+        // ファイルを作成 or 更新
+        const payload = {
+          message: sha ? `Update diary: ${date}` : `Add diary: ${date}`,
+          content: btoa(unescape(encodeURIComponent(markdown))),
+          branch:  branch,
+        };
+        if (sha) payload.sha = sha;
+
+        const res = await fetch(apiUrl, {
+          method:  'PUT',
+          headers: {
+            'Authorization': `Bearer ${s.token}`,
+            'Accept': 'application/vnd.github+json',
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(payload),
+        });
+
+        if (res.ok) {
+          const data = await res.json();
+          const fileUrl = `https://github.com/${s.owner}/${s.repo}/blob/${branch}/${path}`;
+          showStatus(`✅ 保存しました！ → <a href="${fileUrl}" target="_blank">${path}</a>`, 'success');
+        } else {
+          const err = await res.json();
+          showStatus(`❌ エラー (${res.status}): ${err.message}`, 'error');
+        }
+      } catch (e) {
+        showStatus(`❌ 通信エラー: ${e.message}`, 'error');
+      } finally {
+        btn.disabled = false;
+      }
+    }
+
+    // ===== プレビュー =====
+    function togglePreview() {
+      const section = document.getElementById('preview-section');
+      const date    = document.getElementById('entry-date').value;
+      const body    = document.getElementById('entry-body').value;
+      if (section.style.display === 'block') {
+        section.style.display = 'none';
+      } else {
+        document.getElementById('preview-content').textContent = buildMarkdown(date, body);
+        section.style.display = 'block';
+      }
+    }
+
+    // ===== クリア =====
+    function clearEntry() {
+      if (confirm('入力内容をクリアしますか？')) {
+        document.getElementById('entry-body').value = '';
+        document.getElementById('preview-section').style.display = 'none';
+        hideStatus();
+      }
+    }
+
+    // ===== ステータス表示 =====
+    function showStatus(msg, type) {
+      const el = document.getElementById('status');
+      el.innerHTML = msg;
+      el.className = type;
+    }
+    function hideStatus() {
+      const el = document.getElementById('status');
+      el.className = '';
+      el.textContent = '';
+    }
+
+    // ===== 初期化 =====
+    loadSettings();
+    initDate();
+  </script>
+
+</body>
+</html>
